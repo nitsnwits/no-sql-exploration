@@ -1,5 +1,37 @@
 
 import zipfile
+import pyorient
+
+
+client = pyorient.OrientDB("localhost", 2424)
+
+client.connect("root", "root")
+print "connection established!!"
+
+dbPresent = client.db_exists( "library", pyorient.STORAGE_TYPE_PLOCAL )
+if dbPresent == True:
+	print "deleting and creating again"
+	client.db_drop("library")
+
+client.db_create("library", pyorient.DB_TYPE_GRAPH, pyorient.STORAGE_TYPE_PLOCAL)
+print "created db"
+client.db_open("library", "root", "root")
+
+client.command("create class user extends V")
+client.command("create property user.name string")
+client.command("create class book extends V")
+client.command("create property book.title string")
+client.command("create property book.release_date string")
+client.command("create property book.language string")
+#client.command("create property book.whole_book string")
+client.command("create class comments extends V")
+client.command("create property comments.comment string")
+client.command("create class written extends E")
+client.command("create class read extends E")
+client.command("create class recommends extends E")
+client.command("create class belongs_to extends E")
+
+print "successfully created vertex and edges"
 
 zp = zipfile.ZipFile('books.zip')
 
@@ -14,6 +46,7 @@ for book in zp.infolist():
 	openBook = zp.open(book)
 	data = openBook.readlines()
 
+	language = "English"
 	#titleCountInBook = 0
 	lineCount = 0
 	titleFound = False
@@ -46,7 +79,7 @@ for book in zp.infolist():
 			dateCountInBook = dateCountInBook + 1
 			if dateCountInBook > 1:
 				bookName = bookName+book.filename+" "
-'''
+		'''
 		if line.lower().find('[etext')!= -1 and lineCount < 100 and rDateFound == False:
 
 			rdate = line.lower().split('[etext')[0]
@@ -77,8 +110,9 @@ for book in zp.infolist():
 
 			#titleFound = True
 			language = line.split(':')[1].strip()
-			print language
+			#print language
 			languageCount = languageCount+1
+
 
 
 	#if titleFound == False:
@@ -86,9 +120,15 @@ for book in zp.infolist():
 	#if rDateFound == False:
 	#	bookName = bookName+book.filename+" "
 	bookCount = bookCount+1
+	openBook.close()
+	client.command("insert into user (name) values ('"+author+"')")
+	client.command("insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')")
 
+	#client.command("create edge written from (select from user where name = '"+author+"') to (select from book where title = '"+title+"')")
+
+	print "inserted records in user and book... created an edge between them "+str(bookCount)
 	# reading whole book
-	wholeBook = openBook.read()
+	#wholeBook = openBook.read()
 
 
 
@@ -96,5 +136,5 @@ print "total no of files in zip " +str(bookCount)
 print "total no of titles of books "+str(titleCount)
 print "total no of authors of books "+str(authorCount)
 print "total no of release dates found "+str(releaseDateCount)
-print "total no of languages found "+str(languageCount)
+#print "total no of languages found "+str(languageCount)
 print "these are the irregular books "+bookName

@@ -1,6 +1,10 @@
 
 import zipfile
 import pyorient
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 
 client = pyorient.OrientDB("localhost", 2424)
@@ -42,7 +46,7 @@ releaseDateCount = 0
 languageCount = 0
 bookName = ""
 for book in zp.infolist():
-	#print book.filename
+	print book.filename
 	openBook = zp.open(book)
 	data = openBook.readlines()
 
@@ -121,7 +125,13 @@ for book in zp.infolist():
 	#	bookName = bookName+book.filename+" "
 	bookCount = bookCount+1
 	openBook.close()
+	author = author.replace("'", "''")
 	client.command("insert into user (name) values ('"+author+"')")
+	# replace single quote with double quote to help the parser parse the query for embedded single quotes in the text
+	title = title.replace("'", "''")
+	rdate = rdate.replace("'", "''")
+	language = language.replace("'", "''")
+	print " query: " + "insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')"
 	client.command("insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')")
 
 	#client.command("create edge written from (select from user where name = '"+author+"') to (select from book where title = '"+title+"')")
@@ -138,3 +148,6 @@ print "total no of authors of books "+str(authorCount)
 print "total no of release dates found "+str(releaseDateCount)
 #print "total no of languages found "+str(languageCount)
 print "these are the irregular books "+bookName
+
+#sample query:
+#insert into book (title,release_date,language) values ('Divine Comedy Longfellows Translation Hell','april 12 2009','English')

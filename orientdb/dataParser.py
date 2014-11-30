@@ -37,7 +37,7 @@ client.command("create class belongs_to extends E")
 
 print "successfully created vertex and edges"
 
-zp = zipfile.ZipFile('books.zip')
+zp = zipfile.ZipFile('/home/sunny/PycharmProjects/NoSQL226/books.zip')
 
 bookCount = 0
 titleCount = 0
@@ -118,6 +118,10 @@ for book in zp.infolist():
 			languageCount = languageCount+1
 
 
+	openBook.close()
+	#openBook2 = zp.open(book)
+
+	#wholebook = openBook2.read()
 
 	#if titleFound == False:
 	#	bookName = bookName+book.filename+" "
@@ -125,16 +129,41 @@ for book in zp.infolist():
 	#	bookName = bookName+book.filename+" "
 	bookCount = bookCount+1
 	openBook.close()
-	author = author.replace("'", "''")
-	client.command("insert into user (name) values ('"+author+"')")
-	# replace single quote with double quote to help the parser parse the query for embedded single quotes in the text
-	title = title.replace("'", "''")
-	rdate = rdate.replace("'", "''")
-	language = language.replace("'", "''")
-	print " query: " + "insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')"
-	client.command("insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')")
+	author = author.replace("'", "\\'")
+	author = author.replace("(", "\\(")
+	author = author.replace(")", "\\)")
+	author = author.replace('"', '\\"')
+	print "select from user where name ='" + author + "'"
+	resultset = client.command('select from user where name = "' + author + '"')
+	autCount = 0
+	if len(resultset) == 0:
+		resultset = client.command("insert into user (name) values ('"+author+"')")
+	else:
+		for threelist in resultset:
+			print "in the loop"
+			if threelist.name != author:
+				autCount = autCount + 1
 
+	if autCount == len(resultset):
+		resultset = client.command("insert into user (name) values ('"+author+"')")
+
+	#resultset = client.command("insert into user (name) values ('"+author+"')")
+	# replace single quote with double quote to help the parser parse the query for embedded single quotes in the text
+	title = title.replace("'", "\\'")
+	rdate = rdate.replace("'", "\\'")
+	language = language.replace("'", "\\'")
+	#wholebook = wholebook.replace("'","\\'")
+	#print " query: " + "insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')"
+	#resultset2 = client.command("insert into book (title,release_date,language,whole_book) values ('"+title+"','"+rdate+"','"+language+"','"+wholebook+"')")
+	resultset2 = client.command("insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')")
 	#client.command("create edge written from (select from user where name = '"+author+"') to (select from book where title = '"+title+"')")
+	for outValue in resultset:
+		print outValue.rid
+
+	for inValue in resultset2:
+		print inValue.rid
+
+	client.command("create edge written from "+outValue.rid+" to "+inValue.rid)
 
 	print "inserted records in user and book... created an edge between them "+str(bookCount)
 	# reading whole book

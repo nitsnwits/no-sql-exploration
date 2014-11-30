@@ -1,9 +1,15 @@
 from cassandra.cluster import Cluster
 import logging
+import sys
+import os.path
 import time
 
 log = logging.getLogger()
 log.setLevel('INFO')
+log_record_count = 0
+path = '/Users/neerajsharma/Downloads/books/'
+
+iteration = 0
 
 class SimpleClient:
 	session = None
@@ -17,56 +23,63 @@ class SimpleClient:
 			log.info('Datacenter: %s; Host: %s; Rack: %s', host.datacenter, host.address, host.rack)
 
 	def load_data(self):
-		line_count = 0
-
-		fp = open('books/11.txt', 'r')
-		for line in fp:
-			
-			if (line.find('Title:')!= -1 or line.find('Tile:')!= -1):
-				title = line.split(':')[1].strip()
-
-			if line.find('Author:')!=-1:
-				author = line.split(':')[1].strip()
-
 		
-			if line.lower().find('[etext')!= -1:
-
-				r_date = line.lower().split('[etext')[0]
-				if ':' in r_date:
-					r_date = r_date.split(':')[1]
-				r_date = r_date.strip()
+		for root, dirs, filenames in os.walk (path):
+			for file_name in filenames:
 				
-			elif line.lower().find('[ebook')!= -1:
+				# read iteration count
+				global iteration
+				iteration = iteration + 1
+				file_name = path + file_name
+				fp = open(file_name, 'r')
+				for line in fp:
+					
+					if (line.find('Title:')!= -1 or line.find('Tile:')!= -1):
+						title = line.split(':')[1].strip()
 
-				r_date = line.lower().split('[ebook')[0]
-				if ':' in r_date:
-					r_date = r_date.split(':')[1]
-				r_date = r_date.strip()
+					if line.find('Author:')!=-1:
+						author = line.split(':')[1].strip()
 				
-			if line.find('Language:')!=-1:
-				language = line.split(':')[1].strip()
-		fp.close()
+					if line.lower().find('[etext')!= -1:
 
-		fp = open('books/11.txt','r')
-		# reading whole book
-		wholeBook = fp.read()
-		fp.close()
+						r_date = line.lower().split('[etext')[0]
+						if ':' in r_date:
+							r_date = r_date.split(':')[1]
+						r_date = r_date.strip()
+						
+					elif line.lower().find('[ebook')!= -1:
+
+						r_date = line.lower().split('[ebook')[0]
+						if ':' in r_date:
+							r_date = r_date.split(':')[1]
+						r_date = r_date.strip()
+						
+					if line.find('Language:')!=-1:
+						language = line.split(':')[1].strip()
+					else:
+						language = "English"
+
+				fp.close()
+
+				fp = open(file_name,'r')
+				# reading whole book
+				wholeBook = fp.read()
+				fp.close()
 
 
-		stmnt_bk_det = self.session.prepare("""INSERT INTO library.book_details (title, author , language , r_date ) VALUES ( ?, ?, ?, ?);""")
+				stmnt_bk_det = self.session.prepare("""INSERT INTO library.book_details (title, author , language , releasedate ) VALUES ( ?, ?, ?, ?);""")
 
-		stmnt_bk_cnt = self.session.prepare("""INSERT INTO library.book_content (title, content ) VALUES (?, ?);""")
+				stmnt_bk_cnt = self.session.prepare("""INSERT INTO library.book_content (title, content ) VALUES (?, ?);""")
+				
+				self.session.execute(stmnt_bk_det.bind((
+					title, author, language, r_date
+					)))
 
-		self.session.execute(stmnt_bk_det.bind((
-			title, author, language, r_date
-			)))
-
-		self.session.execute(stmnt_bk_cnt.bind((
-			title, wholeBook
-			)))
-
-		log.info('Record added')
-
+				self.session.execute(stmnt_bk_cnt.bind((
+					title, wholeBook
+					)))
+				if (iteration%100 == 0):
+					log.info("Updated number of record: " + str(iteration))
 
 	def close(self):
 		self.session.cluster.shutdown()
@@ -78,7 +91,7 @@ def main():
 	client = SimpleClient()
 	client.connect(['localhost'])
 	client.load_data()
-	client.close()
+	#client.close()
 
 
 if __name__=="__main__":

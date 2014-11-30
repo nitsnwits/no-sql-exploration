@@ -125,16 +125,40 @@ for book in zp.infolist():
 	#	bookName = bookName+book.filename+" "
 	bookCount = bookCount+1
 	openBook.close()
-	author = author.replace("'", "''")
-	client.command("insert into user (name) values ('"+author+"')")
+	author = author.replace("'", "\\'")
+	author = author.replace("(", "\\(")
+	author = author.replace(")", "\\)")
+	author = author.replace('"', '\\"')
+	print "select from user where name ='" + author + "'"
+	resultset = client.command('select from user where name = "' + author + '"')
+	autCount = 0
+	if len(resultset) == 0:
+		resultset = client.command("insert into user (name) values ('"+author+"')")
+	else:
+		for threelist in resultset:
+			print "in the loop"
+			if threelist.name != author:
+				autCount = autCount + 1
+
+	if autCount == len(resultset):
+		resultset = client.command("insert into user (name) values ('"+author+"')")
+
+	#resultset = client.command("insert into user (name) values ('"+author+"')")
 	# replace single quote with double quote to help the parser parse the query for embedded single quotes in the text
-	title = title.replace("'", "''")
-	rdate = rdate.replace("'", "''")
-	language = language.replace("'", "''")
+	title = title.replace("'", "\\'")
+	rdate = rdate.replace("'", "\\'")
+	language = language.replace("'", "\\'")
 	print " query: " + "insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')"
-	client.command("insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')")
+	resultset2 = client.command("insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')")
 
 	#client.command("create edge written from (select from user where name = '"+author+"') to (select from book where title = '"+title+"')")
+	for outValue in resultset:
+		print outValue.rid
+
+	for inValue in resultset2:
+		print inValue.rid
+
+	client.command("create edge written from "+outValue.rid+" to "+inValue.rid)
 
 	print "inserted records in user and book... created an edge between them "+str(bookCount)
 	# reading whole book

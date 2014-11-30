@@ -110,7 +110,7 @@ class SimpleClient:
 
 	def drop_schema(self):
 		self.session.execute("""
-			DROP KEYSPACE library
+			DROP KEYSPACE IF EXISTS library
 			""")				
 
 	def close(self):

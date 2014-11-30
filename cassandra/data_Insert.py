@@ -81,6 +81,38 @@ class SimpleClient:
 				if (iteration%100 == 0):
 					log.info("Updated number of record: " + str(iteration))
 
+	def load_schema(self):
+		self.session.execute("""
+			CREATE KEYSPACE library WITH replication = 
+			{'class': 'SimpleStrategy', 'replication_factor': 1};
+			""")
+
+		self.session.execute("""
+			CREATE COLUMNFAMILY library.book_details 
+			(title varchar PRIMARY KEY, author varchar, language varchar, releasedate varchar, bookclub varchar );""")
+
+		self.session.execute("""
+			CREATE COLUMNFAMILY library.book_content (title varchar PRIMARY KEY , content blob );
+			""")
+
+		self.session.execute("""
+			CREATE COLUMNFAMILY library.titlesByAuthor ( author varchar PRIMARY KEY, titles set<varchar >);			
+		""")
+
+		self.session.execute("""
+			CREATE COLUMNFAMILY library.titlesByYear ( year int PRIMARY KEY , titles set < varchar > );
+		""")
+
+		self.session.execute("""
+			CREATE COLUMNFAMILY library.users ( username varchar PRIMARY KEY , firstname varchar , 
+				lastname varchar , booksread list < varchar >, wantstoread list <varchar >, bookclubs list < varchar >);			
+			""")
+
+	def drop_schema(self):
+		self.session.execute("""
+			DROP KEYSPACE library
+			""")				
+
 	def close(self):
 		self.session.cluster.shutdown()
 		self.session.shutdown()
@@ -90,6 +122,8 @@ def main():
 	logging.basicConfig()
 	client = SimpleClient()
 	client.connect(['localhost'])
+	client.drop_schema()
+	client.load_schema()
 	client.load_data()
 	#client.close()
 

@@ -37,7 +37,7 @@ client.command("create class belongs_to extends E")
 
 print "successfully created vertex and edges"
 
-zp = zipfile.ZipFile('books.zip')
+zp = zipfile.ZipFile('/home/sunny/PycharmProjects/NoSQL226/books.zip')
 
 bookCount = 0
 titleCount = 0
@@ -118,6 +118,10 @@ for book in zp.infolist():
 			languageCount = languageCount+1
 
 
+	openBook.close()
+	#openBook2 = zp.open(book)
+
+	#wholebook = openBook2.read()
 
 	#if titleFound == False:
 	#	bookName = bookName+book.filename+" "
@@ -148,9 +152,10 @@ for book in zp.infolist():
 	title = title.replace("'", "\\'")
 	rdate = rdate.replace("'", "\\'")
 	language = language.replace("'", "\\'")
-	print " query: " + "insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')"
+	#wholebook = wholebook.replace("'","\\'")
+	#print " query: " + "insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')"
+	#resultset2 = client.command("insert into book (title,release_date,language,whole_book) values ('"+title+"','"+rdate+"','"+language+"','"+wholebook+"')")
 	resultset2 = client.command("insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')")
-
 	#client.command("create edge written from (select from user where name = '"+author+"') to (select from book where title = '"+title+"')")
 	for outValue in resultset:
 		print outValue.rid

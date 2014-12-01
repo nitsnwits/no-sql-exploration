@@ -6,3 +6,4 @@ CREATE COLUMNFAMILY titlesByAuthor ( author varchar PRIMARY KEY, titles set<varc
 CREATE COLUMNFAMILY titlesByYear ( year int PRIMARY KEY , titles set < varchar > );
 CREATE COLUMNFAMILY users ( username varchar PRIMARY KEY , firstname varchar , lastname varchar , booksread list < varchar >, wantstoread list <varchar >, bookclubs list < varchar >);
 CREATE COLUMNFAMILY comments ( title varchar PRIMARY KEY, comments set < text >, username varchar ) ;
+create index on comments(username);

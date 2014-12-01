@@ -40,7 +40,11 @@ class SimpleClient:
 
 					if line.find('Author:')!=-1:
 						author = line.split(':')[1].strip()
-				
+						author_fn = author.split(" ")
+						for a in author_fn:
+							f_name = a[0]
+							l_name = a[1]
+
 					if line.lower().find('[etext')!= -1:
 
 						r_date = line.lower().split('[etext')[0]

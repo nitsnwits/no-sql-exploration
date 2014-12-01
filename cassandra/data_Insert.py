@@ -70,18 +70,23 @@ class SimpleClient:
 				book_club = random.choice(book_clubs)
 				print book_club
 
-				#stmnt_bk_det = self.session.prepare("""INSERT INTO library.book_details (title, author , language , releasedate ) VALUES ( ?, ?, ?, ?);""")
+				stmnt_bk_det = self.session.prepare("""INSERT INTO library.book_details (title, author , language , releasedate ) VALUES ( ?, ?, ?, ?);""")
 
-				#stmnt_bk_cnt = self.session.prepare("""INSERT INTO library.book_content (title, content ) VALUES (?, ?);""")
+				stmnt_bk_cnt = self.session.prepare("""INSERT INTO library.book_content (title, content ) VALUES (?, ?);""")
 				
-				'''self.session.execute(stmnt_bk_det.bind((
+				stmnt_users = self.session.prepare("""INSERT INTO library.users (username, firstname, lastname, booksread, wantstoread, bookclubs) VALUES (?, ?, ?, 					?, ?, ?) """)
+
+				self.session.execute(stmnt_bk_det.bind((
 					title, author, language, r_date
 					)))
 
-				#self.session.execute(stmnt_bk_cnt.bind((
+				self.session.execute(stmnt_bk_cnt.bind((
 					title, wholeBook
 					)))
-				'''
+				self.session.execute(stmnt_users.bind((
+					author, f_name, l_name, title, title, random.choice(book_clubs)
+					)))
+
 				if (iteration%100 == 0):
 					log.info("Updated number of record: " + str(iteration))
 

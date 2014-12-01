@@ -40,10 +40,18 @@ class SimpleClient:
 
 					if line.find('Author:')!=-1:
 						author = line.split(':')[1].strip()
-						author_fn = author.split(" ")
-						for a in author_fn:
-							f_name = a[0]
-							l_name = a[1]
+						if author != "":
+							author_fn = author.split(" ")
+							print author_fn
+							f_name = author_fn[0]
+							if len(author_fn) > 1:
+								l_name = author_fn[1]
+							else:
+								l_name = ""
+						else:
+							author = "Uknown"
+							f_name = ""
+							l_name = ""
 
 					if line.lower().find('[etext')!= -1:
 
@@ -71,9 +79,6 @@ class SimpleClient:
 				wholeBook = fp.read()
 				fp.close()
 
-				book_club = random.choice(book_clubs)
-				print book_club
-
 				stmnt_bk_det = self.session.prepare("""INSERT INTO library.book_details (title, author , language , releasedate ) VALUES ( ?, ?, ?, ?);""")
 
 				stmnt_bk_cnt = self.session.prepare("""INSERT INTO library.book_content (title, content ) VALUES (?, ?);""")
@@ -87,8 +92,10 @@ class SimpleClient:
 				self.session.execute(stmnt_bk_cnt.bind((
 					title, wholeBook
 					)))
+				titleList = [title]
+				bookclubsList = [random.choice(book_clubs)]
 				self.session.execute(stmnt_users.bind((
-					author, f_name, l_name, title, title, random.choice(book_clubs)
+					author, f_name, l_name, titleList, titleList, bookclubsList
 					)))
 
 				if (iteration%100 == 0):

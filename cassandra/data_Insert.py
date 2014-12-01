@@ -3,12 +3,13 @@ import logging
 import sys
 import os.path
 import time
+import random 
 
 log = logging.getLogger()
 log.setLevel('INFO')
 log_record_count = 0
 path = '/Users/neerajsharma/Downloads/books/'
-
+book_clubs = [ 'Fiction', 'Non-Fiction', 'Biography', 'Autobiography', 'Fairy Tale', 'History']
 iteration = 0
 
 class SimpleClient:
@@ -66,18 +67,21 @@ class SimpleClient:
 				wholeBook = fp.read()
 				fp.close()
 
+				book_club = random.choice(book_clubs)
+				print book_club
 
-				stmnt_bk_det = self.session.prepare("""INSERT INTO library.book_details (title, author , language , releasedate ) VALUES ( ?, ?, ?, ?);""")
+				#stmnt_bk_det = self.session.prepare("""INSERT INTO library.book_details (title, author , language , releasedate ) VALUES ( ?, ?, ?, ?);""")
 
-				stmnt_bk_cnt = self.session.prepare("""INSERT INTO library.book_content (title, content ) VALUES (?, ?);""")
+				#stmnt_bk_cnt = self.session.prepare("""INSERT INTO library.book_content (title, content ) VALUES (?, ?);""")
 				
-				self.session.execute(stmnt_bk_det.bind((
+				'''self.session.execute(stmnt_bk_det.bind((
 					title, author, language, r_date
 					)))
 
-				self.session.execute(stmnt_bk_cnt.bind((
+				#self.session.execute(stmnt_bk_cnt.bind((
 					title, wholeBook
 					)))
+				'''
 				if (iteration%100 == 0):
 					log.info("Updated number of record: " + str(iteration))
 

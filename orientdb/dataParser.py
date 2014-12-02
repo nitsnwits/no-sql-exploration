@@ -2,6 +2,7 @@
 import zipfile
 import pyorient
 import sys
+from random import randint
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -30,10 +31,22 @@ client.command("create property book.language string")
 #client.command("create property book.whole_book string")
 client.command("create class comments extends V")
 client.command("create property comments.comment string")
+client.command("create class bookClubs extends V")
+client.command("create property bookClubs.category string")
 client.command("create class written extends E")
 client.command("create class read extends E")
-client.command("create class recommends extends E")
+client.command("create class completed extends E")
 client.command("create class belongs_to extends E")
+client.command("create class interested_in extends E")
+client.command("insert into bookClubs (category) values ('biography'),('philosophy'),('mystery'),('fantasy'),('history')")
+
+
+bookCategories = { 1:"biography",
+                   2:"philosophy",
+                   3:"mystery",
+                   4:"fantasy",
+                   5:"history"}
+
 
 print "successfully created vertex and edges"
 
@@ -50,6 +63,7 @@ for book in zp.infolist():
 	openBook = zp.open(book)
 	data = openBook.readlines()
 
+	book_cat = bookCategories[randint(1,5)]
 	language = "English"
 	#titleCountInBook = 0
 	lineCount = 0
@@ -127,6 +141,7 @@ for book in zp.infolist():
 	#	bookName = bookName+book.filename+" "
 	#if rDateFound == False:
 	#	bookName = bookName+book.filename+" "
+	book_cat = bookCategories[randint(1,5)]
 	bookCount = bookCount+1
 	openBook.close()
 	author = author.replace("'", "\\'")
@@ -157,15 +172,19 @@ for book in zp.infolist():
 	#resultset2 = client.command("insert into book (title,release_date,language,whole_book) values ('"+title+"','"+rdate+"','"+language+"','"+wholebook+"')")
 	resultset2 = client.command("insert into book (title,release_date,language) values ('"+title+"','"+rdate+"','"+language+"')")
 	#client.command("create edge written from (select from user where name = '"+author+"') to (select from book where title = '"+title+"')")
-	for outValue in resultset:
-		print outValue.rid
+	resultset3 = client.command("select from bookClubs where category = '"+book_cat+"'")
+	for onelist in resultset:
+		print onelist.rid
 
-	for inValue in resultset2:
-		print inValue.rid
+	for twolist in resultset2:
+		print twolist.rid
 
-	client.command("create edge written from "+outValue.rid+" to "+inValue.rid)
+	for fourlist in resultset3:
+		print fourlist.rid
+	client.command("create edge written from "+onelist.rid+" to "+twolist.rid)
+	client.command("create edge belongs_to from "+twolist.rid+" to "+fourlist.rid)
 
-	print "inserted records in user and book... created an edge between them "+str(bookCount)
+	print "inserted records in user, book and bookClubs... created edges between them "+str(bookCount)
 	# reading whole book
 	#wholeBook = openBook.read()
 

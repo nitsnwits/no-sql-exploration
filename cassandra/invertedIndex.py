@@ -51,6 +51,19 @@ class InvertedIndex(object):
 		resultSet = self.invertedIndex[keyword.lower()]
 		return resultSet
 
+	def lookupPhrase(self, phrase):
+		"""
+		Should Support phrase search which unions the result set of all the words each
+		"""
+		wordlist = phrase.split(' ')
+		if len(wordlist) <= 1:
+			return self.lookup(wordlist[0])
+		else:
+			for word in wordlist:
+				print word
+				#print self.lookup(word)
+
+
 def readStopWords(path):
 	"""
 	Reads stopwords txt and returns a stop words list
@@ -69,9 +82,11 @@ def main():
 	stopwords = readStopWords(path)
 	ii = InvertedIndex(['localhost'])
 	ii.build(stopwords)
-	print ii.lookup('The')
-	print ii.lookup('Moon')
-	print ii.lookup('Valley of the Moon')
+	print ii.lookup('Valley')
+	print ii.lookup('of')
+	print ii.lookup('the')
+	print ii.lookupPhrase('Moon')
+	print ii.lookupPhrase('Valley of the Moon')
 
 if __name__ == '__main__':
 	main()

@@ -55,13 +55,14 @@ class InvertedIndex(object):
 		"""
 		Should Support phrase search which unions the result set of all the words each
 		"""
+		returnList = []
 		wordlist = phrase.split(' ')
 		if len(wordlist) <= 1:
 			return self.lookup(wordlist[0])
 		else:
 			for word in wordlist:
-				print word
-				#print self.lookup(word)
+				returnList += self.lookup(word)
+		return returnList
 
 
 def readStopWords(path):

@@ -44,7 +44,7 @@ class InvertedIndex(object):
 					self.invertedIndex[word].append(row.title)
 		print "Built InvertedIndex"
 
-	def lookup(self, keyword):
+	def lookupWord(self, keyword):
 		"""
 		Support search functionality using the index built
 		"""
@@ -58,10 +58,10 @@ class InvertedIndex(object):
 		returnList = []
 		wordlist = phrase.split(' ')
 		if len(wordlist) <= 1:
-			return self.lookup(wordlist[0])
+			return self.lookupWord(wordlist[0])
 		else:
 			for word in wordlist:
-				returnList += self.lookup(word)
+				returnList += self.lookupWord(word)
 		return returnList
 
 
@@ -83,11 +83,11 @@ def main():
 	stopwords = readStopWords(path)
 	ii = InvertedIndex(['localhost'])
 	ii.build(stopwords)
-	print ii.lookup('Valley')
-	print ii.lookup('of')
-	print ii.lookup('the')
-	print ii.lookupPhrase('Moon')
-	print ii.lookupPhrase('Valley of the Moon')
+	print "Valley: ", ii.lookupPhrase('Valley')
+	print "of: ", ii.lookupPhrase('of')
+	print "the: ", ii.lookupPhrase('the')
+	print "Moon: ", ii.lookupPhrase('Moon')
+	print "Valley of the Moon: ", ii.lookupPhrase('Valley of the Moon')
 
 if __name__ == '__main__':
 	main()

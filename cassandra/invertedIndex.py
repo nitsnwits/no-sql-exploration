@@ -62,7 +62,23 @@ class InvertedIndex(object):
 		else:
 			for word in wordlist:
 				returnList += self.lookupWord(word)
-		return returnList
+		# give weight to more occurrences and result at top
+		weightedReturnDict = {}
+		for title in returnList:
+			if title in weightedReturnDict.keys():
+				weightedReturnDict[title] += 1
+			else:
+				weightedReturnDict[title] = 1
+		return weightedReturnDict
+
+	def printPhraseLookupResults(self, weightedReturnDict):
+		"""
+		Print results with weight in consideration
+		"""
+		# sort the list from values and return the most weighted result first
+		for title in sorted(weightedReturnDict, key=weightedReturnDict.get, reverse=True):
+			print "Title: ->\t" + title + "\t\tMatches: -> " + str(weightedReturnDict[title])
+		return
 
 
 def readStopWords(path):
@@ -87,7 +103,7 @@ def main():
 	print "of: ", ii.lookupPhrase('of')
 	print "the: ", ii.lookupPhrase('the')
 	print "Moon: ", ii.lookupPhrase('Moon')
-	print "Valley of the Moon: ", ii.lookupPhrase('Valley of the Moon')
+	print ii.printPhraseLookupResults(ii.lookupPhrase('Valley of the Moon'))
 
 if __name__ == '__main__':
 	main()

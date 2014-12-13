@@ -157,7 +157,7 @@ class SimpleClient:
 		start = time.time()
 		f = open('c10', 'w')
 		print "Start time:\t" + str(start)
-		count = self.session.execute("Select comments from comments where username = 'userName';")
+		count = self.session.execute("Select comments from comments where username = 'Homer';")
 		for line in count:
 			f.write(str(line.comments)+"\n")
 			print line.titles	
@@ -173,7 +173,7 @@ class SimpleClient:
 		start = time.time()
 		f = open('c11', 'w')
 		print "Start time:\t" + str(start)
-		count = self.session.execute("select comments from comments where title = 'titleName' and username = 'userName';")
+		count = self.session.execute("select comments from comments where title = 'The Iliad of Homer' and username = 'Homer';")
 		for line in count:
 			f.write(str(line.bookclubs)+"\n")
 			#print line.titles	
@@ -189,7 +189,7 @@ class SimpleClient:
 		start = time.time()
 		f = open('c12', 'w')
 		print "Start time:\t" + str(start)
-		count = self.session.execute("select title, comments from comments where username = 'userName';")
+		count = self.session.execute("select title, comments from comments where username = 'Homer';")
 		for line in count:
 			f.write(str(line.bookclubs)+"\n")
 			#print line.titles	
@@ -205,7 +205,7 @@ class SimpleClient:
 		start = time.time()
 		f = open('c13', 'w')
 		print "Start time:\t" + str(start)
-		count = self.session.execute("select title from book_details where bookclub = 'null';")
+		count = self.session.execute("select title from book_details where bookclub = 'Autobiography';")
 		for line in count:
 			f.write(str(line.bookclubs)+"\n")
 			#print line.titles	

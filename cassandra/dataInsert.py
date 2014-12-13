@@ -42,7 +42,7 @@ class SimpleClient:
 						author = line.split(':')[1].strip()
 						if author != "":
 							author_fn = author.split(" ")
-							print author_fn
+							#print author_fn
 							f_name = author_fn[0]
 							if len(author_fn) > 1:
 								l_name = author_fn[1]

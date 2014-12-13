@@ -76,6 +76,7 @@ class InvertedIndex(object):
 		Print results with weight in consideration
 		"""
 		# sort the list from values and return the most weighted result first
+		print "Phrase Lookup Results: \n"
 		for title in sorted(weightedReturnDict, key=weightedReturnDict.get, reverse=True):
 			print "Title: ->\t" + title + "\t\tMatches: -> " + str(weightedReturnDict[title])
 		return
@@ -99,6 +100,7 @@ def main():
 	stopwords = readStopWords(path)
 	ii = InvertedIndex(['localhost'])
 	ii.build(stopwords)
+	print "Word Lookup Results: \n"
 	print "Valley: ", ii.lookupPhrase('Valley')
 	print "of: ", ii.lookupPhrase('of')
 	print "the: ", ii.lookupPhrase('the')
